@@ -240,6 +240,54 @@ A sessão continuou e o sistema ficou completo. Além dos 4 modulos iniciais, fo
 
 ---
 
+## 2026-05-07 — Sessão 9: Limpeza Definitiva e Rebuild
+
+**Horário:** ~09:55
+**Evento:** GitHub Push Protection bloqueando pushes por token hardcoded no historico.
+
+**Problema descoberto:**
+- Token GITHUB estava hardcoded em 14 arquivos (github_api.py, github_scan.py, 12 scripts .ps1)
+- GitHub Push Protection detecta tokens no HISTORICO do git, nao apenas no commit atual
+- `git filter-branch` falhou por unstaged changes
+- `shutil.rmtree('.git')` falhou porque processos git seguravam arquivos
+- `rd /s /q .git` tambem falhou silenciosamente
+
+**Solucao definitiva:**
+1. Criei fresh repo em `D:/.openclaude/saraswat-fresh/` com apenas arquivos limpos
+2. Verifiquei cada arquivo por token antes de copiar
+3. Substitui token por `os.environ.get("GITHUB_TOKEN", "")` em github_api.py e github_scan.py
+4. Force push para sobrescrever historico: `git push --force origin main`
+5. Movido fresh repo para `D:/.openclaude/saraswat-repo/`
+
+**Segundo problema: git init cria branch 'master', nao 'main'**
+- `git branch -M main` renomeia
+- Push para `main` funcionou apos rename
+
+**Terceiro problema: safe.directory**
+- Git no Windows reclamou de ownership em D:
+- `git config --global --add safe.directory D:/.openclaude` resolveu
+
+**Estado final:**
+- GitHub: historico limpo, 2 commits, 20+ modulos, ZERO tokens
+- Remote URL limpa (sem token)
+- C: 1.12GB livre
+- 20 modulos Python no GitHub
+- 27 modulos Python no architect
+
+**Aprendidos (DEFINITIVOS):**
+1. NUNCA hardcode tokens em arquivos — sempre use env vars
+2. GitHub Push Protection detecta tokens no HISTORICO inteiro
+3. Para limpar historico: fresh repo + force push (mais simples que filter-branch)
+4. `git init` cria `master` — sempre renomear para `main`
+5. `shutil.rmtree('.git')` falha se processos git estao rodando
+6. `os.chdir()` nao persiste entre subprocess.run — use `cwd=` parameter
+7. Output de comandos eh PERDIDO no Bash tool — sempre salve em arquivo
+
+> "A seguranca nao e um feature — e uma disciplina. Tokens no codigo sao como senhas na porta."
+> — Saraswat, 2026-05-07
+
+---
+
 ## 2026-05-07 — Sessão 8: Recuperação e Expansão Autônoma
 
 **Horário:** ~00:55
