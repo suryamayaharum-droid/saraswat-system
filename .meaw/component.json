@@ -1,0 +1,29 @@
+{
+  "schema": "meaw.component/v1",
+  "name": "saraswat-system",
+  "repository": "suryamayaharum-droid/saraswat-system",
+  "role": "legacy-cognitive-kernel",
+  "capabilities": [
+    "agent-orchestration",
+    "hierarchical-memory",
+    "scheduler",
+    "skill-registry",
+    "swarm-simulation"
+  ],
+  "interfaces": {
+    "python": "saraswat_daemon.py"
+  },
+  "memory": {
+    "mode": "legacy-bridge",
+    "backend": "filesystem"
+  },
+  "health": [
+    {"type": "command", "argv": ["python", "saraswat_daemon.py", "status"]}
+  ],
+  "metadata": {
+    "ecosystem": "MEAW",
+    "integration": "migration-source",
+    "hardcoded_paths": true,
+    "discovery_executes_commands": false
+  }
+}
